@@ -6,10 +6,14 @@ on:
     inputs:
       build_type:
         type: string
-        # default: "dev"
+        default: "dev"
       s3_subdir:
         type: string
         default: "v2"
+
+  schedule:
+    - cron: " 0 15 * * *"
+
 
 permissions:
   contents: read
@@ -18,11 +22,12 @@ jobs:
   setup_metadata:
     runs-on: ubuntu-24.04
     outputs:
-      version: ${{ steps.release_information.outputs. version }}
+      version: ${{ steps.release_information.outputs.version }}
       release_type: ${{ inputs.build_type || 'nightly' }}
     steps:
-      - name: Generate release information (1)
+      - name: Generate release information
         if: ${{ inputs.build_type == 'nightly' }}
+        id: release_information
         run: |
           version_suffix="$(printf 'rc%(%Y%m%d)T')"
           echo "version=${version_suffix}" >> $GITHUB_OUTPUT
