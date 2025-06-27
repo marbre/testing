@@ -12,7 +12,7 @@ on:
         default: "v2"
 
   schedule:
-    - cron: '8 15 * * *'
+    - cron: '*/5 * * * *'
 
 
 permissions:
