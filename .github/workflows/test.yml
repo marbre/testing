@@ -10,7 +10,6 @@ on:
       s3_subdir:
         type: string
         default: "v2"
-
   schedule:
     - cron: '*/5 * * * *'
 
