@@ -1,0 +1,45 @@
+name: Test workflow
+
+on:
+  # Trigger manually
+  workflow_dispatch:
+    inputs:
+      build_type:
+        type: string
+        # default: "dev"
+      s3_subdir:
+        type: string
+        default: "v2"
+
+permissions:
+  contents: read
+    
+jobs:
+  setup_metadata:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.release_information.outputs. version }}
+      release_type: ${{ inputs.build_type || 'nightly' }}
+    steps:
+      - name: Generate release information (1)
+        if: ${{ inputs.build_type == 'nightly' }}
+        run: |
+          version_suffix="$(printf 'rc%(%Y%m%d)T')"
+          echo "version=${version_suffix}" >> $GITHUB_OUTPUT
+      - name: Generate release information (2)
+        if: ${{ inputs.build_type == '' }}
+        run: |
+          version_suffix="$(printf 'rc%(%Y%m%d)T')"
+          echo "version=${version_suffix}" >> $GITHUB_OUTPUT
+
+
+  build_package:
+    runs-on: ubuntu-24.04
+    needs: setup_metadata
+    env:
+      RELEASE_TYPE: ${{ needs.setup_metadata.outputs.release_type }}
+    
+    steps:
+      - name: Test environment
+        run: |
+          echo ${{ env.RELEASE_TYPE }}
