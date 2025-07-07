@@ -1,4 +1,4 @@
-name: Test workflow
+name: Determine version
 
 on:
   # Trigger manually
@@ -33,9 +33,9 @@ jobs:
           pip install packaging
       
       - name: Determine version
-        if: ${{ inputs.skip }}
+        if: ${{ !inputs.skip }}
         run: |
-          python build_tools/github_actions/determine_version.py
+          python build_tools/github_actions/determine_version.py --rocm-version ${{ inputs.rocm_version }}
 
       - name: Build PyTorch Wheels
         run: |
