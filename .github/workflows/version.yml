@@ -1,0 +1,42 @@
+name: Test workflow
+
+on:
+  # Trigger manually
+  workflow_dispatch:
+    inputs:
+      rocm_version:
+        description: ROCm version to pip install
+        type: string
+      skip:
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+    
+jobs:
+  testjob:
+    runs-on: ubuntu-24.04
+    env:
+      optional_build_prod_arguments: ""
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    
+      - name: Setup Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: 3.12
+      
+      - name: Install dependencies
+        run: |
+          pip install packaging
+      
+      - name: Determine version
+        if: ${{ inputs.skip }}
+        run: |
+          python build_tools/github_actions/determine_version.py
+
+      - name: Build PyTorch Wheels
+        run: |
+          echo "${{ env.optional_build_prod_arguments }}"
